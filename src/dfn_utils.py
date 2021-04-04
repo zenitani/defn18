@@ -9,7 +9,8 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from datetime import datetime as dt
 import numpy as np
-import tensorflow as tf
+# import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 def make_iso8601_filename(prefix="tmp"):

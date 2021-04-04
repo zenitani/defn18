@@ -1,7 +1,12 @@
-# Deep Flare Net (DeFN) Astrophysical Journal 2018 version
+# Deep Flare Net (DeFN) TensorFlow 2 version
 
+Seiji Zenitani,
+Research Center for Urban Safety and Security, Kobe University, Japan
+
+Originally developed by
 Komei Sugiura,
 National Institute of Information and Communications Technology, Japan
+https://github.com/komeisugiura/defn18.git
 
 ## 0. License
 
@@ -9,8 +14,8 @@ National Institute of Information and Communications Technology, Japan
 
 ## 1. Prerequisite
 
-* Ubuntu 16.04 or 14.04
-* Python 3.4.3
+* Ubuntu 20.04 LTS
+* Python 3.8
 
 ## 2. Install
 
@@ -18,10 +23,9 @@ National Institute of Information and Communications Technology, Japan
 
 ```
 $ cd ~/work/
-$ git clone https://github.com/komeisugiura/defn18.git
+$ git clone https://github.com/zenitani/defn18.git
 $ cd defn18
-$ pip install -r requirements.txt
-$ pip install --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.0.1-cp34-cp34m-linux_x86_64.whl
+$ pip3 install tensorflow
 ```
 
 ## 3. Download data
@@ -33,13 +37,13 @@ $ cd ~/work/
 $ mv defn_feature_database_v1_pl.zip ./
 $ unzip defn_feature_database_v1_pl.zip
 (password is required)
-$ ln -s defn_feature_database_v1/defn_input_database/charval2017X_*.csv.gz ./defn18/data/
+$ cp defn_feature_database_v1/defn_input_database/charval2017X_*.csv.gz ./defn18/data/
 ```
 
 ## 4. Run
 
 ```
-$ cd ~/work/src
+$ cd ~/work/defn18/src
 $ ./01RUN_deepflarenet.sh
 ```
 

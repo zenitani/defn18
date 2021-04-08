@@ -6,10 +6,7 @@ DeFN main
 
 """
 
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import numpy as np
-
 # import tensorflow as tf
 import tensorflow.compat.v1 as tf
 tf.disable_eager_execution()

@@ -44,7 +44,7 @@ $ cp defn_feature_database_v1/defn_input_database/charval2017X_*.csv.gz ./defn18
 
 ```
 $ cd ~/work/defn18/src
-$ ./01RUN_deepflarenet.sh
+$ ./deepflarenet.py
 ```
 
 * The following result will be shown. This means that TSS=0.8024 is obtained by using a pretrained model.

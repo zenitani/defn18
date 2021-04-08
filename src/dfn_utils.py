@@ -5,8 +5,6 @@
 Utility functions for Deep Flare Net
 """
 
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 from datetime import datetime as dt
 import numpy as np
 # import tensorflow as tf
@@ -28,15 +26,6 @@ def generate_random_onehot_vectors(nb_classes, size):
     tmp = np.random.random_integers(0, nb_classes - 1, size)
     one_hot_targets = np.eye(nb_classes)[tmp]
     return one_hot_targets
-
-
-def leaky_relu(X, leak=0.2):
-    """
-    Notice: leaky relu's author says it does not work
-    """
-    f1 = 0.5 * (1 + leak)
-    f2 = 0.5 * (1 - leak)
-    return f1 * X + f2 * tf.abs(X)
 
 
 def TSS(y_true, y_pred):

@@ -7,8 +7,10 @@ DeFN main
 """
 
 import numpy as np
+import argparse
 # import tensorflow as tf
 import tensorflow.compat.v1 as tf
+import tensorflow_addons.activations as tfa
 tf.disable_eager_execution()
 
 import mydata_loader
@@ -78,22 +80,34 @@ class DeepFlareNet(object):
         network structure
         h0: input layer
         """
-        h1 = tf.nn.relu(tf.matmul(X, self.ext_W[0]) + self.ext_b[0])
-        # h1 = tf.nn.swish(tf.matmul(X, self.ext_W[0]) + self.ext_b[0])
-        h1d = tf.nn.dropout(h1, self.pkeep)
-
-        h2bn = self.relu_BN(h1d, self.ext_W[1], self.is_training, "ext_BN_1")
-        h3bn = self.relu_BN(h2bn, self.ext_W[2], self.is_training, "ext_BN_2") + X
-        h4bn = self.relu_BN(h3bn, self.ext_W[3], self.is_training, "ext_BN_3")
-        h5bn = self.relu_BN(h4bn, self.ext_W[4], self.is_training, "ext_BN_4")
-        h6bn = self.relu_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + X
-        h7bn = self.relu_BN(h6bn, self.ext_W[6], self.is_training, "ext_BN_6")
-        # h2bn = self.swish_BN(h1d, self.ext_W[1], self.is_training, "ext_BN_1")
-        # h3bn = self.swish_BN(h2bn, self.ext_W[2], self.is_training, "ext_BN_2") + X
-        # h4bn = self.swish_BN(h3bn, self.ext_W[3], self.is_training, "ext_BN_3")
-        # h5bn = self.swish_BN(h4bn, self.ext_W[4], self.is_training, "ext_BN_4")
-        # h6bn = self.swish_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + X
-        # h7bn = self.swish_BN(h6bn, self.ext_W[6], self.is_training, "ext_BN_6")
+        mode=1
+        if mode==1:
+            h1 = tf.nn.relu(tf.matmul(X, self.ext_W[0]) + self.ext_b[0])
+            h1d = tf.nn.dropout(h1, self.pkeep)
+            h2bn = self.relu_BN(h1d, self.ext_W[1], self.is_training, "ext_BN_1")
+            h3bn = self.relu_BN(h2bn, self.ext_W[2], self.is_training, "ext_BN_2") + X
+            h4bn = self.relu_BN(h3bn, self.ext_W[3], self.is_training, "ext_BN_3")
+            h5bn = self.relu_BN(h4bn, self.ext_W[4], self.is_training, "ext_BN_4")
+            h6bn = self.relu_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + X
+            h7bn = self.relu_BN(h6bn, self.ext_W[6], self.is_training, "ext_BN_6")
+        elif mode==2:
+            h1 = tf.nn.swish(tf.matmul(X, self.ext_W[0]) + self.ext_b[0])
+            h1d = tf.nn.dropout(h1, self.pkeep)
+            h2bn = self.swish_BN(h1d, self.ext_W[1], self.is_training, "ext_BN_1")
+            h3bn = self.swish_BN(h2bn, self.ext_W[2], self.is_training, "ext_BN_2") + X
+            h4bn = self.swish_BN(h3bn, self.ext_W[3], self.is_training, "ext_BN_3")
+            h5bn = self.swish_BN(h4bn, self.ext_W[4], self.is_training, "ext_BN_4")
+            h6bn = self.swish_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + X
+            h7bn = self.swish_BN(h6bn, self.ext_W[6], self.is_training, "ext_BN_6")
+        elif mode==3:
+            h1 = tfa.mish(tf.matmul(X, self.ext_W[0]) + self.ext_b[0])
+            h1d = tf.nn.dropout(h1, self.pkeep)
+            h2bn = self.mish_BN(h1d, self.ext_W[1], self.is_training, "ext_BN_1")
+            h3bn = self.mish_BN(h2bn, self.ext_W[2], self.is_training, "ext_BN_2") + X
+            h4bn = self.mish_BN(h3bn, self.ext_W[3], self.is_training, "ext_BN_3")
+            h5bn = self.mish_BN(h4bn, self.ext_W[4], self.is_training, "ext_BN_4")
+            h6bn = self.mish_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + X
+            h7bn = self.mish_BN(h6bn, self.ext_W[6], self.is_training, "ext_BN_6")
 
         y_pred = tf.nn.softmax(tf.matmul(h7bn, self.ext_W[7]) + self.ext_b[7])
 
@@ -171,6 +185,28 @@ class DeepFlareNet(object):
                                                          # name=None,
                                                          name=name,
                                                          reuse=None))
+
+    def mish_BN(self, x, w, is_training, name="tmp"):
+        """
+        Args:
+        x: input feature tensor
+        w: weight matrix
+        is_training: in training->True, in testing->False
+        """
+        return tfa.mish(tf.layers.batch_normalization(tf.matmul(x, w),
+                                                      momentum=0.99,
+                                                      epsilon=0.001,
+                                                      center=True,
+                                                      scale=False,
+                                                      beta_initializer=tf.zeros_initializer(),
+                                                      gamma_initializer=tf.ones_initializer(),
+                                                      moving_mean_initializer=tf.zeros_initializer(),
+                                                      moving_variance_initializer=tf.ones_initializer(),
+                                                      training=is_training,
+                                                      trainable=True,
+                                                      # name=None,
+                                                      name=name,
+                                                      reuse=None))
 
     def initialize_model(self):
         """
@@ -291,11 +327,12 @@ class DeepFlareNet(object):
         # text = "[{0:06d}]Acc: Tra={1:0.4f}, Val={2:0.4f}, Tes={3:0.4f}, MaxVal={4:0.4f}({5:0.4f})"
         # print(text.format(epoch, tra_acc, val_acc, tes_acc,
         #                   self.max_val_acc, self.tes_acc_when_max_val))
-
         text = "[{0:06d}]Acc: Tra={1:0.4f}, Val={2:0.4f}, Tes={3:0.4f}, MaxVal={4:0.4f}({5:0.4f}), TSS={6:0.4f}"
         print(text.format(epoch, tra_acc, val_acc, tes_acc,
-                          self.max_val_acc, self.tes_acc_when_max_val,
-                          tes_tss))
+                         self.max_val_acc, self.tes_acc_when_max_val,
+                         tes_tss))
+        # text = "{0:06d} {1:0.4f}"
+        # print(text.format(epoch, tes_tss))
 
     def calc_accuracy(self, xtmp, ytmp, pkeep):
         """
@@ -340,13 +377,23 @@ class DeepFlareNet(object):
         return t
 
 
-def main(argv):
+# def main(argv):
+def main():
     """
     extractor main
     """
     # 0. Setup
     np.random.seed(0)
-    myflag = tf.flags.FLAGS  # To use tf.flags.DEFINE_** in __main__
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--max_epoch', type=int, default=16000, help='Maximum epoch')
+    parser.add_argument('--inprefix', default='../data/charval2017X_M24', help='[Input] Prefix for train_feat, train_label, validation_feat, validation_label, test_feat, test_label files')
+    parser.add_argument('--outprefix_pred', default='./predictions/charval2017X_M24_test_Epred', help='[Output] Prefix for prediction file')
+    parser.add_argument('--outfile_model', default='../model/charval2017X_M24_Emodel.ckpt', help='[Output] Model file for saving')
+    parser.add_argument('--infile_model', default='../model/charval2017X_M24_Emodel.ckpt', help='[In] Model file for loading')
+    parser.add_argument('--logdir', default='./log/deepflarenet', help='[Output] Directory for tensorflow logs')
+
+    myflag = parser.parse_args()
     outprefix_latent = myflag.inprefix + "c"
     outfile_pred = make_iso8601_filename(myflag.outprefix_pred)
 
@@ -371,39 +418,18 @@ def main(argv):
     net1.initialize_model()
 
     # # 2. Train and Save
-    # net1.train_model(update_interval=100)
+    net1.train_model(update_interval=100)
     # # net1.save_model(myflag.outfile_model)
 
     # 3. Load and Test
     net1.load_model(myflag.infile_model)
     net1.show_training_status(epoch=8000)
 
+    
 if __name__ == "__main__":
-    # The following defines are used in the main function
-    # Usage: tf.flags.DEFINE_**(NAME, DEFAULT_VALUE, DOCSTRING)
-    tf.flags.DEFINE_integer("max_epoch",
-                            # 10000,
-                            16000,
-                            "Maximum epoch")
-    tf.flags.DEFINE_string("inprefix",
-                           "../data/charval2017X_M24",
-                           "[Input] Prefix for train_feat, train_label, validation_feat, validation_label, test_feat, test_label files")
-    tf.flags.DEFINE_string("outprefix_pred",
-                           "./predictions/charval2017X_M24_test_Epred",
-                           "[Output] Prefix for prediction file")
-    tf.flags.DEFINE_string("outfile_model",
-                           "../model/charval2017X_M24_Emodel.ckpt",
-                           "[Output] Model file for saving")
-    tf.flags.DEFINE_string("infile_model",
-                           "../model/charval2017X_M24_Emodel.ckpt",
-                           "[In] Model file for loading")
-    tf.flags.DEFINE_string("logdir",
-                           "./log/deepflarenet",
-                           "[Output] Directory for tensorflow logs")
-    tf.app.run(main=main)
 
-
-
+    main()
+    
 
 # Local Variables:
 # coding: utf-8

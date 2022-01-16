@@ -88,7 +88,7 @@ class DeepFlareNet(object):
             h3bn = self.relu_BN(h2bn, self.ext_W[2], self.is_training, "ext_BN_2") + X
             h4bn = self.relu_BN(h3bn, self.ext_W[3], self.is_training, "ext_BN_3")
             h5bn = self.relu_BN(h4bn, self.ext_W[4], self.is_training, "ext_BN_4")
-            h6bn = self.relu_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + X
+            h6bn = self.relu_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + h3bn
             h7bn = self.relu_BN(h6bn, self.ext_W[6], self.is_training, "ext_BN_6")
         elif mode==2:
             h1 = tf.nn.swish(tf.matmul(X, self.ext_W[0]) + self.ext_b[0])
@@ -97,7 +97,7 @@ class DeepFlareNet(object):
             h3bn = self.swish_BN(h2bn, self.ext_W[2], self.is_training, "ext_BN_2") + X
             h4bn = self.swish_BN(h3bn, self.ext_W[3], self.is_training, "ext_BN_3")
             h5bn = self.swish_BN(h4bn, self.ext_W[4], self.is_training, "ext_BN_4")
-            h6bn = self.swish_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + X
+            h6bn = self.swish_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + h3bn
             h7bn = self.swish_BN(h6bn, self.ext_W[6], self.is_training, "ext_BN_6")
         elif mode==3:
             h1 = tfa.mish(tf.matmul(X, self.ext_W[0]) + self.ext_b[0])
@@ -106,7 +106,7 @@ class DeepFlareNet(object):
             h3bn = self.mish_BN(h2bn, self.ext_W[2], self.is_training, "ext_BN_2") + X
             h4bn = self.mish_BN(h3bn, self.ext_W[3], self.is_training, "ext_BN_3")
             h5bn = self.mish_BN(h4bn, self.ext_W[4], self.is_training, "ext_BN_4")
-            h6bn = self.mish_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + X
+            h6bn = self.mish_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + h3bn
             h7bn = self.mish_BN(h6bn, self.ext_W[6], self.is_training, "ext_BN_6")
 
         y_pred = tf.nn.softmax(tf.matmul(h7bn, self.ext_W[7]) + self.ext_b[7])

@@ -14,7 +14,7 @@ class MyDataLoader:
     """
     My data loader
     """
-    def __init__(self, file_prefix, batchsize=100):
+    def __init__(self, file_prefix, batchsize=100, dropcolumn=-99):
         self.file_prefix = file_prefix
         self.sets = ["train", "validation", "test"]
         # self.sets = ["validation"]
@@ -32,7 +32,11 @@ class MyDataLoader:
             text = "Opening ({0:s}, {1:s})"
             print(text.format(xfile, yfile))
 
-            x = pd.read_csv(xfile, sep=",", header=None)
+            if( dropcolumn < 0 ):
+                x = pd.read_csv(xfile, sep=",", header=None)
+            else:
+                x_tmp = pd.read_csv(xfile, sep=",", header=None)
+                x = x_tmp.drop(dropcolumn, axis=1) #特定の列を除外して読み込み
             y = pd.read_csv(yfile, sep=",", header=None)
 
             # shuffle

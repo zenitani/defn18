@@ -26,7 +26,8 @@ class DeepFlareNet(object):
                  classweights=None,
                  logdir="./tmp",
                  inprefix="tmpin",
-                 outfile_model="tmp.ckpt", outprefix_latent="tmplat", outfile_pred="tmppred"):
+                 outfile_model="tmp.ckpt", outprefix_latent="tmplat", outfile_pred="tmppred",
+                 dropcolumn=-99):
         # initialization
         tf.set_random_seed(0)
         self.batchsize = batchsize
@@ -40,10 +41,12 @@ class DeepFlareNet(object):
         self.outfile_model = outfile_model
         self.outprefix_latent = outprefix_latent
         self.outfile_pred = outfile_pred
+        self.dropcolumn = dropcolumn
 
         # data set
         self.dataloader = mydata_loader.MyDataLoader(file_prefix=self.inprefix,
-                                                     batchsize=self.batchsize)
+                                                     batchsize=self.batchsize,
+                                                     dropcolumn=self.dropcolumn)
         self.trainset_x = self.dataloader.get_data_sets("train", "x")
         self.trainset_y = self.dataloader.get_data_sets("train", "y")
         self.validationset_x = self.dataloader.get_data_sets("validation", "x")
@@ -319,7 +322,7 @@ class DeepFlareNet(object):
             print("Max TSS updated.")
             self.max_tes_tss = tes_tss
             # save the current best results and network params
-            if tes_tss > 0.79:
+            if tes_tss > 0.49:
                 self.save_model(self.outfile_model)
                 self.save_testset_prob(self.outfile_pred)
                 # self.save_transformed_data(self.outprefix_latent)
@@ -391,6 +394,7 @@ def main():
     parser.add_argument('--outprefix_pred', default='./predictions/charval2017X_M24_test_Epred', help='[Output] Prefix for prediction file')
     parser.add_argument('--outfile_model', default='../model/charval2017X_M24_Emodel.ckpt', help='[Output] Model file for saving')
     parser.add_argument('--infile_model', default='../model/charval2017X_M24_Emodel.ckpt', help='[In] Model file for loading')
+    parser.add_argument('--drop_column', type=int, default=-99, help='[In] Drop the selected column in the CSV file')
     parser.add_argument('--logdir', default='./log/deepflarenet', help='[Output] Directory for tensorflow logs')
 
     myflag = parser.parse_args()
@@ -408,12 +412,15 @@ def main():
     # 1. Initialize
     net1 = DeepFlareNet(batchsize=150,
                         max_epoch=myflag.max_epoch,
-                        classweights=[1, 60],
+                        # classweights=[1, 12],
+                        classweights=[1, 50],
+                        # classweights=[1, 60],
                         logdir=myflag.logdir,
                         inprefix=myflag.inprefix,
                         outfile_model=myflag.outfile_model,
                         outprefix_latent=outprefix_latent,
-                        outfile_pred=outfile_pred)
+                        outfile_pred=outfile_pred,
+                        dropcolumn=myflag.drop_column)
     net1.print_dnn_setting()
     net1.initialize_model()
 

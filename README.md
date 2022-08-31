@@ -12,10 +12,12 @@ https://github.com/komeisugiura/defn18.git
 
 * BSD 3-Clause Clear License
 
-## 1. Prerequisite
+## 1. Requirements
 
 * Ubuntu 20.04 LTS
 * Python 3.8
+  * numpy, pandas, scikit-learn (sklearn)
+  * tensorflow 2, tensorflow_addons
 
 ## 2. Install
 
@@ -25,7 +27,8 @@ https://github.com/komeisugiura/defn18.git
 $ cd ~/work/
 $ git clone https://github.com/zenitani/defn18.git
 $ cd defn18
-$ pip3 install tensorflow
+$ pip3 install tensorflow tensorflow_addons
+[ $ pip3 install tensorflow tensorflow_addons numpy pandas sklearn ]
 ```
 
 ## 3. Download data

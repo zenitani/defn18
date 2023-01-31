@@ -10,7 +10,6 @@ import numpy as np
 import argparse
 # import tensorflow as tf
 import tensorflow.compat.v1 as tf
-import tensorflow_addons.activations as tfa
 tf.disable_eager_execution()
 
 import mydata_loader
@@ -102,15 +101,6 @@ class DeepFlareNet(object):
             h5bn = self.swish_BN(h4bn, self.ext_W[4], self.is_training, "ext_BN_4")
             h6bn = self.swish_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + h3bn
             h7bn = self.swish_BN(h6bn, self.ext_W[6], self.is_training, "ext_BN_6")
-        elif mode==3:
-            h1 = tfa.mish(tf.matmul(X, self.ext_W[0]) + self.ext_b[0])
-            h1d = tf.nn.dropout(h1, self.pkeep)
-            h2bn = self.mish_BN(h1d, self.ext_W[1], self.is_training, "ext_BN_1")
-            h3bn = self.mish_BN(h2bn, self.ext_W[2], self.is_training, "ext_BN_2") + X
-            h4bn = self.mish_BN(h3bn, self.ext_W[3], self.is_training, "ext_BN_3")
-            h5bn = self.mish_BN(h4bn, self.ext_W[4], self.is_training, "ext_BN_4")
-            h6bn = self.mish_BN(h5bn, self.ext_W[5], self.is_training, "ext_BN_5") + h3bn
-            h7bn = self.mish_BN(h6bn, self.ext_W[6], self.is_training, "ext_BN_6")
 
         y_pred = tf.nn.softmax(tf.matmul(h7bn, self.ext_W[7]) + self.ext_b[7])
 
@@ -188,28 +178,6 @@ class DeepFlareNet(object):
                                                          # name=None,
                                                          name=name,
                                                          reuse=None))
-
-    def mish_BN(self, x, w, is_training, name="tmp"):
-        """
-        Args:
-        x: input feature tensor
-        w: weight matrix
-        is_training: in training->True, in testing->False
-        """
-        return tfa.mish(tf.layers.batch_normalization(tf.matmul(x, w),
-                                                      momentum=0.99,
-                                                      epsilon=0.001,
-                                                      center=True,
-                                                      scale=False,
-                                                      beta_initializer=tf.zeros_initializer(),
-                                                      gamma_initializer=tf.ones_initializer(),
-                                                      moving_mean_initializer=tf.zeros_initializer(),
-                                                      moving_variance_initializer=tf.ones_initializer(),
-                                                      training=is_training,
-                                                      trainable=True,
-                                                      # name=None,
-                                                      name=name,
-                                                      reuse=None))
 
     def initialize_model(self):
         """
